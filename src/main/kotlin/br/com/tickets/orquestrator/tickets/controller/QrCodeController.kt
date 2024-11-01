@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @RestController
-@CrossOrigin(origins = ["*"])
 class QrCodeController(
     val qrCodeComponent: DefaultQrCodeComponent
 ) {
