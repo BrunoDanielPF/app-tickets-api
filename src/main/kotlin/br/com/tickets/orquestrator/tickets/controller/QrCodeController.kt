@@ -3,37 +3,45 @@ package br.com.tickets.orquestrator.tickets.controller
 import br.com.tickets.orquestrator.tickets.domain.QRCodeData
 import br.com.tickets.orquestrator.tickets.service.DefaultQrCodeComponent
 import com.google.zxing.WriterException
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
+import java.util.*
 
 @RestController
+@SuppressWarnings("unused")
 class QrCodeController(
     val qrCodeComponent: DefaultQrCodeComponent
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(QrCodeController::class.java)
+
+    @Operation(
+        summary = "Cria um QrCode",
+        security = [SecurityRequirement(name = "basicScheme")]
+    )
+    @PreAuthorize("hasRole('USER_ADMIN') || hasRole('USER')")
     @GetMapping("/generate-qr-code", produces = [MediaType.IMAGE_PNG_VALUE])
     fun generateQRCode(
         @RequestParam userName: String,
-        @RequestParam eventName: String,
-        @RequestParam enabled: Boolean,
+        @RequestParam eventName: String
     ): ResponseEntity<ByteArray> {
         return try {
             val qrData = QRCodeData(
                 userName = userName,
                 eventName = eventName,
-                enabled = enabled,
+                enabled = true,
                 couponCode = UUID.randomUUID().toString(),
                 dateValid = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/mm/yyyy"))
             )

@@ -16,5 +16,5 @@ data class UserRequest(
     var password: String,
 
     @JsonProperty("cargo")
-    var roles: List<Role>
+    var roles: List<Role>?
 )

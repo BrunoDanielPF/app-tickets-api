@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@SuppressWarnings("unused")
 class SecurityConfig(
     private val userDetailsService: UserDetailsService
 ) {
@@ -49,15 +50,16 @@ class SecurityConfig(
         http.csrf { it.disable() }
             .cors { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeRequests {
-                it.requestMatchers("/h2-console/**").permitAll()
-                it.requestMatchers("/users/**").permitAll()
-                it.requestMatchers(HttpMethod.GET).permitAll()
-                it.anyRequest().authenticated()
+            .authorizeHttpRequests { auths ->
+                auths
+                    .requestMatchers(HttpMethod.GET).hasRole("USER")
+                    .requestMatchers(HttpMethod.POST).hasRole("USER_ADMIN")
+                    .requestMatchers(HttpMethod.PUT).hasRole("USER_ADMIN")
+                    .requestMatchers("/users/**", "/h2-console/**").permitAll()
             }
+            .headers { headersConfigures -> headersConfigures.frameOptions { it.sameOrigin() } }
             .exceptionHandling { it.authenticationEntryPoint(accessDeniedHandler()) }
             .addFilterBefore(customBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
         return http.build()
     }
 }

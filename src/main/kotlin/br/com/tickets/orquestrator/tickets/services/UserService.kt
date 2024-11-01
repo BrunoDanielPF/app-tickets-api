@@ -48,7 +48,7 @@ class UserService(
     }
 
     fun register(userRequest: UserRequest): String {
-        if (userRequest.roles.isEmpty()) {
+        if (userRequest.roles.isNullOrEmpty()) {
             userRequest.roles = listOf(Role(1, "USER"))
         }
         if (userRepository.existsByEmail(userRequest.email)) {
@@ -65,7 +65,7 @@ class UserService(
                 email = userRequest.email,
                 name = userRequest.name,
                 password = userRequest.password,
-                roles = userRequest.roles,
+                roles = userRequest.roles!!,
             )
         )
         return "User registered successfully!"
