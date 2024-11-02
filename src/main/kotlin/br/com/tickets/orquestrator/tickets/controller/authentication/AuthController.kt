@@ -29,7 +29,7 @@ class AuthController(private val userService: UserService) {
         return ResponseEntity(userService.changePassword(loginDto), HttpStatus.OK)
     }
 
-    @RequestMapping("/signup", method = [RequestMethod.GET, RequestMethod.POST], consumes = ["application/json"])
+    @RequestMapping("/signup", method = [RequestMethod.POST], consumes = ["application/json"])
     @Operation(summary = "Cadastra usuário")
     fun registerUser(@RequestBody userRequest: UserRequest): ResponseEntity<Nothing> {
         return userService.register(userRequest)
