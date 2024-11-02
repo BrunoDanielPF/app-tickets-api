@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@SuppressWarnings("unused")
 class SecurityConfig(
     private val userDetailsService: UserDetailsService
 ) {
@@ -52,10 +51,11 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auths ->
                 auths
-                    .requestMatchers(HttpMethod.GET).hasRole("USER")
+                    .requestMatchers(HttpMethod.DELETE).hasRole("USER_ADMIN")
+                    .requestMatchers(HttpMethod.PATCH).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.POST).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.PUT).hasRole("USER_ADMIN")
-                    .requestMatchers("/users/**", "/h2-console/**").permitAll()
+                    .anyRequest().permitAll()
             }
             .headers { headersConfigures -> headersConfigures.frameOptions { it.sameOrigin() } }
             .exceptionHandling { it.authenticationEntryPoint(accessDeniedHandler()) }
