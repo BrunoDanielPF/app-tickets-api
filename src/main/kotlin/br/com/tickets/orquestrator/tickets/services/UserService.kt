@@ -5,9 +5,12 @@ import br.com.tickets.orquestrator.tickets.controller.authentication.UserRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.Image
 import br.com.tickets.orquestrator.tickets.domain.entity.Role
 import br.com.tickets.orquestrator.tickets.domain.entity.User
+import br.com.tickets.orquestrator.tickets.exceptions.EmailInUseException
 import br.com.tickets.orquestrator.tickets.exceptions.NotFoundUserException
 import br.com.tickets.orquestrator.tickets.exceptions.PasswordFormatException
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -47,12 +50,12 @@ class UserService(
         return "Image uploaded successfully!"
     }
 
-    fun register(userRequest: UserRequest): String {
+    fun register(userRequest: UserRequest): ResponseEntity<Nothing> {
         if (userRequest.roles.isNullOrEmpty()) {
             userRequest.roles = listOf(Role(1, "USER"))
         }
         if (userRepository.existsByEmail(userRequest.email)) {
-            return "Email in use!"
+            throw EmailInUseException("E-mail already exists")
         }
         userRequest.password = passwordEncoder.encode(validatePassword(userRequest.password))
         try {
@@ -68,7 +71,7 @@ class UserService(
                 roles = userRequest.roles!!,
             )
         )
-        return "User registered successfully!"
+        return ResponseEntity(null, HttpStatus.CREATED)
     }
 
     fun changePassword(authenticationDTO: AuthenticationDTO): String {

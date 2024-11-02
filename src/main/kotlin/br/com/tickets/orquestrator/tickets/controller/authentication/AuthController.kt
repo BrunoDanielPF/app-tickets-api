@@ -31,11 +31,11 @@ class AuthController(private val userService: UserService) {
 
     @PostMapping("/signup")
     @Operation(summary = "Cadastra usuário")
-    fun registerUser(@RequestBody userRequest: UserRequest): ResponseEntity<String> {
-        return ResponseEntity(userService.register(userRequest), HttpStatus.OK)
+    fun registerUser(@RequestBody userRequest: UserRequest): ResponseEntity<Nothing> {
+        return userService.register(userRequest)
     }
 
-    @PostMapping(value = ["{email}"], consumes = ["multipart/form-data"])
+    @RequestMapping(value = ["{email}"], consumes = ["multipart/form-data"], method = [RequestMethod.GET, RequestMethod.POST])
     @Operation(summary = "Insere uma imagem em um usuário")
     @Throws(IOException::class)
     fun insertImageOnUser(
