@@ -56,7 +56,7 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.DELETE).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.POST).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.PUT).hasRole("USER_ADMIN")
-//                    .anyRequest().permitAll()
+                    .requestMatchers(HttpMethod.GET).permitAll()
             }
             .headers { headersConfigures -> headersConfigures.frameOptions { it.sameOrigin() } }
             .exceptionHandling { it.authenticationEntryPoint(accessDeniedHandler()) }
