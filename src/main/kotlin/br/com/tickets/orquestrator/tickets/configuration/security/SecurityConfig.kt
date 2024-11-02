@@ -1,6 +1,6 @@
 package br.com.tickets.orquestrator.tickets.configuration.security
 
-import br.com.tickets.orquestrator.tickets.configuration.security.handler.CustomAccessDeniedHandler
+import br.com.tickets.orquestrator.tickets.configuration.security.handler.CustomAuthenticationHandlerEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -36,8 +36,8 @@ class SecurityConfig(
     }
 
     @Bean
-    fun accessDeniedHandler(): AuthenticationEntryPoint {
-        return CustomAccessDeniedHandler()
+    fun customAuthenticationHandlerEntrypoint(): AuthenticationEntryPoint {
+        return CustomAuthenticationHandlerEntryPoint()
     }
 
     @Bean
@@ -59,7 +59,7 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.GET).permitAll()
             }
             .headers { headersConfigures -> headersConfigures.frameOptions { it.sameOrigin() } }
-            .exceptionHandling { it.authenticationEntryPoint(accessDeniedHandler()) }
+            .exceptionHandling { it.authenticationEntryPoint(customAuthenticationHandlerEntrypoint()) }
             .addFilterBefore(customBasicAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
