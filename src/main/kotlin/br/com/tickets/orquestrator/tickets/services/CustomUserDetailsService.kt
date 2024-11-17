@@ -1,6 +1,8 @@
 package br.com.tickets.orquestrator.tickets.services
 
+import br.com.tickets.orquestrator.tickets.exceptions.EmailNotVerifiedException
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,9 +23,18 @@ class CustomUserDetailsService(private val userRepository: UserRepository) : Use
             SimpleGrantedAuthority(role.name)
         }.toSet()
 
+        val accountNonExpired = true
+        val credentialsNonExpired = true
+        val accountNonLocked = true
+        val enabled = user.emailValidated
+
         return org.springframework.security.core.userdetails.User(
             user.email,
             user.password,
+            enabled,
+            accountNonExpired,
+            credentialsNonExpired,
+            accountNonLocked,
             authorities
         )
     }

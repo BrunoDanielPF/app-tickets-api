@@ -6,9 +6,7 @@ import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserVal
 import br.com.tickets.orquestrator.tickets.domain.entity.Image
 import br.com.tickets.orquestrator.tickets.domain.entity.Role
 import br.com.tickets.orquestrator.tickets.domain.entity.User
-import br.com.tickets.orquestrator.tickets.exceptions.EmailInUseException
-import br.com.tickets.orquestrator.tickets.exceptions.NotFoundUserException
-import br.com.tickets.orquestrator.tickets.exceptions.PasswordFormatException
+import br.com.tickets.orquestrator.tickets.exceptions.*
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
 import com.sendgrid.Method
 import com.sendgrid.Request
@@ -81,7 +79,7 @@ class UserService(
             roles = userRequest.roles!!,
             emailCode = generateEmailCode(),
             emailValidated = false,
-            emailCodeExpiration = LocalDateTime.now().plusMinutes(15)
+            emailCodeExpiration = generateTimeExpirationCode()
         )
         userRepository.save(
             user
@@ -109,36 +107,33 @@ class UserService(
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(authenticationDTO.email, authenticationDTO.password)
         )
+
         SecurityContextHolder.getContext().authentication = authentication
         return "User signed in successfully!"
     }
 
     fun validatedEmailFromUser(userValidatedRequest: UserValidatedRequest) {
         val user = getUser(email = userValidatedRequest.email, name = null, id = null)
-        if (user.emailCode?.equals(userValidatedRequest.code) == true) {
+        if (user.emailCode == userValidatedRequest.code && user.emailCodeExpiration!!.isAfter(LocalDateTime.now())) {
             user.emailValidated = true
             user.emailCode = null
             user.emailCodeExpiration = null
             userRepository.save(user)
         } else {
-            throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid code")
+            throw InvalidCodeException("Invalid code")
         }
-    }
-
-    private fun validatePassword(password: String): String {
-        if (!Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$", password)) {
-            throw PasswordFormatException()
-        }
-        return password
     }
 
     fun resendEmailToConfirmAccount(to: String) {
         val user = getUser(id = null, email = to, name = null)
+        user.emailCode = generateEmailCode()
+        user.emailCodeExpiration = generateTimeExpirationCode()
         sendEmailToConfirmAccount(
             to = user.email,
             name = user.name,
             code = user.emailCode
         )
+        userRepository.save(user)
     }
 
     private fun sendEmailToConfirmAccount(to: String, name: String, code: Int?) {
@@ -183,8 +178,16 @@ class UserService(
             logger.atError().setMessage(ex.message).log()
         }
     }
-
+    private fun validatePassword(password: String): String {
+        if (!Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$", password)) {
+            throw PasswordFormatException()
+        }
+        return password
+    }
     private fun generateEmailCode(): Int {
         return (1000..9999).random()
+    }
+    private fun generateTimeExpirationCode(): LocalDateTime? {
+        return LocalDateTime.now().plusMinutes(15)
     }
 }

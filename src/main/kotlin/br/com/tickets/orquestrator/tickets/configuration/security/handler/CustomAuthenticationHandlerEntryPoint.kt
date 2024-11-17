@@ -11,7 +11,8 @@ class CustomAuthenticationHandlerEntryPoint: AuthenticationEntryPoint {
         response: HttpServletResponse?,
         authException: AuthenticationException?
     ) {
-        response?.status = HttpServletResponse.SC_UNAUTHORIZED
-        response?.writer?.print("Access Denied, verify you is authenticate for this request")
+        response?.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response?.setContentType("application/json");
+        response?.getWriter()?.write("{\"error\": \"Unauthorized\", \"message\": \"" + authException?.message + "\"}");
     }
 }
