@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
@@ -24,6 +25,12 @@ data class User(
 
     @JsonProperty("senha")
     var password: String,
+
+    var emailValidated: Boolean,
+
+    var emailCode: Int? = null,
+
+    var emailCodeExpiration: LocalDateTime? = null,
 
     @OneToOne(cascade = [CascadeType.ALL])
     @JsonProperty("imagem")

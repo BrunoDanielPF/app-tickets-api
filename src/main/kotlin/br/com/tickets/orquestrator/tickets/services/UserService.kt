@@ -1,7 +1,8 @@
 package br.com.tickets.orquestrator.tickets.services
 
 import br.com.tickets.orquestrator.tickets.controller.authentication.AuthenticationDTO
-import br.com.tickets.orquestrator.tickets.controller.authentication.UserRequest
+import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserRequest
+import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserValidatedRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.Image
 import br.com.tickets.orquestrator.tickets.domain.entity.Role
 import br.com.tickets.orquestrator.tickets.domain.entity.User
@@ -9,6 +10,15 @@ import br.com.tickets.orquestrator.tickets.exceptions.EmailInUseException
 import br.com.tickets.orquestrator.tickets.exceptions.NotFoundUserException
 import br.com.tickets.orquestrator.tickets.exceptions.PasswordFormatException
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
+import com.sendgrid.Method
+import com.sendgrid.Request
+import com.sendgrid.SendGrid
+import com.sendgrid.helpers.mail.Mail
+import com.sendgrid.helpers.mail.objects.Content
+import com.sendgrid.helpers.mail.objects.Email
+import com.sendgrid.helpers.mail.objects.Personalization
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -18,8 +28,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import java.io.IOException
+import java.time.LocalDateTime
 import java.util.regex.Pattern
+
 
 @Service
 class UserService(
@@ -27,6 +40,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
 ) {
+
+    val logger: Logger = LoggerFactory.getLogger(UserService::class.simpleName)
 
     fun getUser(id: Long?, name: String?, email: String?): User {
         email?.let {
@@ -58,19 +73,27 @@ class UserService(
             throw EmailInUseException("E-mail already exists")
         }
         userRequest.password = passwordEncoder.encode(validatePassword(userRequest.password))
+
+        val user = User(
+            email = userRequest.email,
+            name = userRequest.name,
+            password = userRequest.password,
+            roles = userRequest.roles!!,
+            emailCode = generateEmailCode(),
+            emailValidated = false,
+            emailCodeExpiration = LocalDateTime.now().plusMinutes(15)
+        )
+        userRepository.save(
+            user
+        )
+
+        logger.atDebug().addKeyValue("usuario", user).log("usuario cadastrado")
+
         try {
-//            emailValidation.sendEmail(userRequest.email, userRequest.name)
+            sendEmailToConfirmAccount(user.email, user.name, user.emailCode)
         } catch (ioException: IOException) {
             throw RuntimeException("Error validating email for registration, please provide a valid email")
         }
-        userRepository.save(
-            User(
-                email = userRequest.email,
-                name = userRequest.name,
-                password = userRequest.password,
-                roles = userRequest.roles!!,
-            )
-        )
         return ResponseEntity(null, HttpStatus.CREATED)
     }
 
@@ -90,10 +113,78 @@ class UserService(
         return "User signed in successfully!"
     }
 
-    fun validatePassword(password: String): String {
+    fun validatedEmailFromUser(userValidatedRequest: UserValidatedRequest) {
+        val user = getUser(email = userValidatedRequest.email, name = null, id = null)
+        if (user.emailCode?.equals(userValidatedRequest.code) == true) {
+            user.emailValidated = true
+            user.emailCode = null
+            user.emailCodeExpiration = null
+            userRepository.save(user)
+        } else {
+            throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid code")
+        }
+    }
+
+    private fun validatePassword(password: String): String {
         if (!Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$", password)) {
             throw PasswordFormatException()
         }
         return password
+    }
+
+    fun resendEmailToConfirmAccount(to: String) {
+        val user = getUser(id = null, email = to, name = null)
+        sendEmailToConfirmAccount(
+            to = user.email,
+            name = user.name,
+            code = user.emailCode
+        )
+    }
+
+    private fun sendEmailToConfirmAccount(to: String, name: String, code: Int?) {
+        val NAME_DYNAMIC_DATA = "nome";
+        val CODE_DYNAMIC_DATA = "codigo";
+
+        val from = Email(System.getenv("ORGANIZATION_EMAIL"))
+
+        val subject = "Confirme o e-mail para concluir o cadastro !"
+
+        val emailToSendConfirmation = Email(to)
+
+        val content = Content("text/html", "descricao")
+
+        val mail = Mail(from, subject, emailToSendConfirmation, content)
+
+
+        val personalization = Personalization()
+        personalization.addTo(emailToSendConfirmation)
+
+        val dynamicData: MutableMap<String, String> = HashMap()
+        dynamicData[NAME_DYNAMIC_DATA] = name
+        dynamicData[CODE_DYNAMIC_DATA] = code.toString()
+
+        for ((key, value) in dynamicData) {
+            personalization.addDynamicTemplateData(key, value)
+        }
+
+        mail.addPersonalization(personalization)
+        mail.setTemplateId(System.getenv("TEMPLATE_ID"));
+        val sg = SendGrid(System.getenv("API_KEY_SEND_GRID_EMAIL"))
+
+        val request = Request()
+
+        try {
+            request.setMethod(Method.POST)
+            request.setEndpoint("mail/send")
+            request.setBody(mail.build())
+            val response = sg.api(request)
+            logger.atInfo().addKeyValue("status code", response.statusCode).addKeyValue("body", response.body).log("resposta do email do email")
+        } catch (ex: IOException) {
+            logger.atError().setMessage(ex.message).log()
+        }
+    }
+
+    private fun generateEmailCode(): Int {
+        return (1000..9999).random()
     }
 }

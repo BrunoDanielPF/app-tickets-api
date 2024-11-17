@@ -1,4 +1,4 @@
-package br.com.tickets.orquestrator.tickets.controller.authentication
+package br.com.tickets.orquestrator.tickets.controller.authentication.dto
 
 import br.com.tickets.orquestrator.tickets.domain.entity.Role
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -17,4 +17,9 @@ data class UserRequest(
 
     @JsonProperty("cargo")
     var roles: List<Role>?
+)
+
+data class UserValidatedRequest(
+    val email: String,
+    val code: Int
 )

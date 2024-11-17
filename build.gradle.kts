@@ -22,6 +22,8 @@ repositories {
 }
 
 dependencies {
+	//ENVIO DE E-MAIL
+	implementation("com.sendgrid:sendgrid-java:4.10.3")
 	//QR CODE
 	implementation("com.google.zxing:core:3.5.1")
 	implementation("com.google.zxing:javase:3.5.1")

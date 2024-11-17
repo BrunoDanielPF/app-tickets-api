@@ -1,5 +1,7 @@
 package br.com.tickets.orquestrator.tickets.controller.authentication
 
+import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserRequest
+import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserValidatedRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.User
 import br.com.tickets.orquestrator.tickets.services.UserService
 import io.swagger.v3.oas.annotations.Operation
@@ -53,5 +55,19 @@ class AuthController(private val userService: UserService) {
         @RequestParam(name = "name", required = false) name: String?
     ): ResponseEntity<User> {
         return ResponseEntity.ok(userService.getUser(id, name, email))
+    }
+
+    @PostMapping("/validated")
+    @Operation(summary = "Valida e-mail de usuario")
+    fun validatedUserEmail(
+        @RequestBody userValidatedRequest: UserValidatedRequest
+    ): ResponseEntity<Unit> {
+        return ResponseEntity.ok(userService.validatedEmailFromUser(userValidatedRequest))
+    }
+
+    @PostMapping("/resend/{email}")
+    @Operation(summary = "Reenvia e-mail com codigo")
+    fun resendEmail(@PathVariable(name = "email") to: String): ResponseEntity<Unit> {
+        return ResponseEntity.ok(userService.resendEmailToConfirmAccount(to))
     }
 }
