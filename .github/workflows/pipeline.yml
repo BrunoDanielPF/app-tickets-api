@@ -42,7 +42,7 @@ jobs:
         with:
           arguments: test
 
-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
