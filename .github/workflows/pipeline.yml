@@ -59,7 +59,6 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
           service: ${{ env.RAILWAY_SERVICE }}
           detach: true
           
