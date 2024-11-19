@@ -5,7 +5,10 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+env:
+  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  RAILWAY_SERVICE: app-tickets-api
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,24 +47,14 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Use Node 16
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v4
         with:
-          node-version: 16.x
+          fetch-depth: 0
 
-      - name: Install packages
-        run: yarn install --frozen-lockfile
-
-      - name: Install Railway
-        run: npm i -g @railway/cli
-      - name: Deploy
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          railway login --browserless
-          railway up
+      - name: Deploy to railway
+        uses: bervProject/railway-deploy@0.1.2-beta
+        with:
+          service: ${{ env.RAILWAY_SERVICE }}
+          detach: true
