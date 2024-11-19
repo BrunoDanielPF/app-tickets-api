@@ -63,5 +63,5 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          railway login
+          railway login --browserless
           railway up
