@@ -54,7 +54,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy to railway
-        uses: bervProject/railway-deploy@0.1.2-beta
+        uses: bervProject/railway-deploy@0.1.1-beta
         with:
           service: ${{ env.RAILWAY_SERVICE }}
           detach: true
