@@ -45,19 +45,19 @@ jobs:
         with:
           arguments: test
 
-  deploy:
+  # deploy:
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
         
-      - name: Deploy to railway
-        uses: bervProject/railway-deploy@main
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #     - name: Deploy to railway
+  #       uses: bervProject/railway-deploy@main
+  #       env:
+  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         with:
           service: ${{ env.RAILWAY_SERVICE }}
           detach: true
