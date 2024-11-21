@@ -58,7 +58,7 @@ jobs:
   #       uses: bervProject/railway-deploy@main
   #       env:
   #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        with:
-          service: ${{ env.RAILWAY_SERVICE }}
-          detach: true
+        # with:
+        #   service: ${{ env.RAILWAY_SERVICE }}
+        #   detach: true
           
