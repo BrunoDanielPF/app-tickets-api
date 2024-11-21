@@ -85,7 +85,7 @@ class UserService(
             user
         )
 
-        logger.atDebug().addKeyValue("usuario", user).log("usuario cadastrado")
+        logger.atInfo().addKeyValue("usuario", user).log("usuario cadastrado")
 
         try {
             sendEmailToConfirmAccount(user.email, user.name, user.emailCode)
@@ -137,6 +137,7 @@ class UserService(
     }
 
     private fun sendEmailToConfirmAccount(to: String, name: String, code: Int?) {
+
         val NAME_DYNAMIC_DATA = "nome";
         val CODE_DYNAMIC_DATA = "codigo";
 
