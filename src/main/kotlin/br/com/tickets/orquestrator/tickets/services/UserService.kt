@@ -88,7 +88,7 @@ class UserService(
         logger.atInfo().addKeyValue("usuario", user).log("usuario cadastrado")
 
         try {
-            sendEmailToConfirmAccount(user.email, user.name, user.emailCode)
+            sendEmailToConfirmAccount(user.email, user.name, user.emailCode!!)
         } catch (ioException: IOException) {
             throw RuntimeException("Error validating email for registration, please provide a valid email")
         }
@@ -131,12 +131,12 @@ class UserService(
         sendEmailToConfirmAccount(
             to = user.email,
             name = user.name,
-            code = user.emailCode
+            code = user.emailCode!!
         )
         userRepository.save(user)
     }
 
-    private fun sendEmailToConfirmAccount(to: String, name: String, code: Int?) {
+    private fun sendEmailToConfirmAccount(to: String, name: String, code: Int) {
 
         val NAME_DYNAMIC_DATA = "nome";
         val CODE_DYNAMIC_DATA = "codigo";
@@ -155,9 +155,9 @@ class UserService(
         val personalization = Personalization()
         personalization.addTo(emailToSendConfirmation)
 
-        val dynamicData: MutableMap<String, String> = HashMap()
+        val dynamicData: MutableMap<String, Any> = HashMap()
         dynamicData[NAME_DYNAMIC_DATA] = name
-        dynamicData[CODE_DYNAMIC_DATA] = code.toString()
+        dynamicData[CODE_DYNAMIC_DATA] = code
 
         for ((key, value) in dynamicData) {
             personalization.addDynamicTemplateData(key, value)
