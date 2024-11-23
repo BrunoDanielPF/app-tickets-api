@@ -169,6 +169,7 @@ class UserService(
 
         val request = Request()
 
+        logger.atInfo().addKeyValue("campos email", dynamicData).log("campos enviado para o email para: $to")
         try {
             request.setMethod(Method.POST)
             request.setEndpoint("mail/send")
