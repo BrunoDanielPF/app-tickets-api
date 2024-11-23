@@ -155,13 +155,9 @@ class UserService(
         val personalization = Personalization()
         personalization.addTo(emailToSendConfirmation)
 
-        val dynamicData: MutableMap<String, Any> = HashMap()
-        dynamicData[NAME_DYNAMIC_DATA] = name
-        dynamicData[CODE_DYNAMIC_DATA] = code
+        personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
+        personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
 
-        for ((key, value) in dynamicData) {
-            personalization.addDynamicTemplateData(key, value)
-        }
 
         mail.addPersonalization(personalization)
         mail.setTemplateId(System.getenv("TEMPLATE_ID"));
@@ -169,7 +165,7 @@ class UserService(
 
         val request = Request()
 
-        logger.atInfo().addKeyValue("campos email", dynamicData).log("campos enviado para o email para: $to")
+        logger.atInfo().addKeyValue("personalizacao", personalization).log("personalizacao do email para: $to")
         try {
             request.setMethod(Method.POST)
             request.setEndpoint("mail/send")
