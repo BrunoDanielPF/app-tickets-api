@@ -141,16 +141,7 @@ class UserService(
         val NAME_DYNAMIC_DATA = "nome";
         val CODE_DYNAMIC_DATA = "codigo";
 
-        val from = Email(System.getenv("ORGANIZATION_EMAIL"))
-
-        val subject = "Confirme o e-mail para concluir o cadastro !"
-
         val emailToSendConfirmation = Email(to)
-
-        val content = Content("text/html", "descricao")
-
-        val mail = Mail(from, subject, emailToSendConfirmation, content)
-
 
         val personalization = Personalization()
         personalization.addTo(emailToSendConfirmation)
@@ -158,9 +149,18 @@ class UserService(
         personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
         personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
 
+        val from = Email(System.getenv("ORGANIZATION_EMAIL"))
+
+        val subject = "Confirme o e-mail para concluir o cadastro !"
+
+        val content = Content()
+
+        val mail = Mail(from, subject, emailToSendConfirmation, content)
+
+        mail.setTemplateId(System.getenv("TEMPLATE_ID"));
 
         mail.addPersonalization(personalization)
-        mail.setTemplateId(System.getenv("TEMPLATE_ID"));
+
         val sg = SendGrid(System.getenv("API_KEY_SEND_GRID_EMAIL"))
 
         val request = Request()
@@ -176,15 +176,18 @@ class UserService(
             logger.atError().setMessage(ex.message).log()
         }
     }
+
     private fun validatePassword(password: String): String {
         if (!Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$", password)) {
             throw PasswordFormatException()
         }
         return password
     }
+
     private fun generateEmailCode(): Int {
         return (1000..9999).random()
     }
+
     private fun generateTimeExpirationCode(): LocalDateTime? {
         return LocalDateTime.now().plusMinutes(15)
     }
