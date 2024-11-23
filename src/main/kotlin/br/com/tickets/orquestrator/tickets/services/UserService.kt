@@ -137,31 +137,26 @@ class UserService(
     }
 
     private fun sendEmailToConfirmAccount(to: String, name: String, code: Int) {
-
-
-        val NAME_DYNAMIC_DATA = "nome";
-        val CODE_DYNAMIC_DATA = "codigo";
+        val NAME_DYNAMIC_DATA = "nome"
+        val CODE_DYNAMIC_DATA = "codigo"
 
         val emailToSendConfirmation = Email(to, name)
 
         val personalization = Personalization()
         personalization.addTo(emailToSendConfirmation)
-
-        val content = Content("text/html", "mock")
+        personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
+        personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
 
         val from = Email(System.getenv("ORGANIZATION_EMAIL"))
 
-        val subject = "Confirme o e-mail para concluir o cadastro !"
+        val subject = "Confirme o e-mail para concluir o cadastro!"
 
-        val mail = Mail(from, subject, emailToSendConfirmation, content)
-
-        mail.addPersonalization(personalization)
-        mail.addContent(content)
-        mail.setTemplateId(System.getenv("TEMPLATE_ID"));
-
-
-        personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
-        personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
+        val mail = Mail().apply {
+            setFrom(from)
+            setSubject(subject)
+            addPersonalization(personalization)
+            setTemplateId(System.getenv("TEMPLATE_ID"))
+        }
 
         val sg = SendGrid(System.getenv("API_KEY_SEND_GRID_EMAIL"))
         val request = Request()
@@ -172,7 +167,10 @@ class UserService(
             request.setEndpoint("mail/send")
             request.setBody(mail.build())
             val response = sg.api(request)
-            logger.atInfo().addKeyValue("status code", response.statusCode).addKeyValue("body", response.body).log("resposta do email do email")
+            logger.atInfo()
+                .addKeyValue("status code", response.statusCode)
+                .addKeyValue("body", response.body)
+                .log("resposta do email do email")
         } catch (ex: IOException) {
             logger.atError().setMessage(ex.message).log()
         }
