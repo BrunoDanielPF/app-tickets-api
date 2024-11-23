@@ -138,31 +138,32 @@ class UserService(
 
     private fun sendEmailToConfirmAccount(to: String, name: String, code: Int) {
 
+
         val NAME_DYNAMIC_DATA = "nome";
         val CODE_DYNAMIC_DATA = "codigo";
 
-        val emailToSendConfirmation = Email(to)
+        val emailToSendConfirmation = Email(to, name)
 
         val personalization = Personalization()
         personalization.addTo(emailToSendConfirmation)
 
-        personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
-        personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
+        val content = Content("text/html", "mock")
 
         val from = Email(System.getenv("ORGANIZATION_EMAIL"))
 
         val subject = "Confirme o e-mail para concluir o cadastro !"
 
-        val content = Content()
-
         val mail = Mail(from, subject, emailToSendConfirmation, content)
 
+        mail.addPersonalization(personalization)
+        mail.addContent(content)
         mail.setTemplateId(System.getenv("TEMPLATE_ID"));
 
-        mail.addPersonalization(personalization)
+
+        personalization.addDynamicTemplateData(NAME_DYNAMIC_DATA, name)
+        personalization.addDynamicTemplateData(CODE_DYNAMIC_DATA, code)
 
         val sg = SendGrid(System.getenv("API_KEY_SEND_GRID_EMAIL"))
-
         val request = Request()
 
         logger.atInfo().addKeyValue("personalizacao", personalization).log("personalizacao do email para: $to")
