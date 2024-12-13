@@ -1,6 +1,6 @@
-package br.com.tickets.orquestrator.tickets.controller.authentication.dto
+package br.com.tickets.orquestrator.tickets.controller.user.authentication.dto
 
-import br.com.tickets.orquestrator.tickets.domain.entity.Role
+import br.com.tickets.orquestrator.tickets.domain.entity.user.Role
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.Email
 
@@ -16,7 +16,7 @@ data class UserRequest(
     var password: String,
 
     @JsonProperty("cargo")
-    var roles: List<Role>?
+    var roles: MutableList<Role>?
 )
 
 data class UserValidatedRequest(

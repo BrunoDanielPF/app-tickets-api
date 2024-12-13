@@ -1,7 +1,10 @@
 package br.com.tickets.orquestrator.tickets.controller
 
 import br.com.tickets.orquestrator.tickets.domain.QRCodeData
-import br.com.tickets.orquestrator.tickets.service.DefaultQrCodeComponent
+import br.com.tickets.orquestrator.tickets.services.DefaultQrCodeComponent
+import br.com.tickets.orquestrator.tickets.services.feign.AsaasClient
+import br.com.tickets.orquestrator.tickets.services.feign.dto.EspecificationResponse
+import br.com.tickets.orquestrator.tickets.services.feign.dto.ResponseCustomer
 import com.google.zxing.WriterException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -22,10 +25,16 @@ import java.util.*
 @RestController
 @SuppressWarnings("unused")
 class QrCodeController(
-    val qrCodeComponent: DefaultQrCodeComponent
+    val qrCodeComponent: DefaultQrCodeComponent,
+    val asaasClient: AsaasClient
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(QrCodeController::class.java)
+
+    @GetMapping("/asaas")
+    fun teste(): EspecificationResponse<MutableList<ResponseCustomer>> {
+        return asaasClient.getCustomer("john.doe@asaas.com.br")
+    }
 
     @Operation(
         summary = "Cria um QrCode",

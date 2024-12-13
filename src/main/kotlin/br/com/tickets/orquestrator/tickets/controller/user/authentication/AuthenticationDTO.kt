@@ -1,4 +1,4 @@
-package br.com.tickets.orquestrator.tickets.controller.authentication
+package br.com.tickets.orquestrator.tickets.controller.user.authentication
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull

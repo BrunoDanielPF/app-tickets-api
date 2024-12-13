@@ -1,6 +1,6 @@
 package br.com.tickets.orquestrator.tickets.configuration.security.principal
 
-import br.com.tickets.orquestrator.tickets.domain.entity.User
+import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 

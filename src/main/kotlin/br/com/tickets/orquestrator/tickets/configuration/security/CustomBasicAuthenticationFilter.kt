@@ -1,7 +1,7 @@
 package br.com.tickets.orquestrator.tickets.configuration.security
 
 import br.com.tickets.orquestrator.tickets.configuration.security.principal.UserPrincipal
-import br.com.tickets.orquestrator.tickets.domain.entity.User
+import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -13,7 +13,6 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import java.util.Base64
-import jakarta.servlet.ServletException
 
 @Component
 class CustomBasicAuthenticationFilter(

@@ -1,8 +1,8 @@
-package br.com.tickets.orquestrator.tickets.controller.authentication
+package br.com.tickets.orquestrator.tickets.controller.user.authentication
 
-import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserRequest
-import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserValidatedRequest
-import br.com.tickets.orquestrator.tickets.domain.entity.User
+import br.com.tickets.orquestrator.tickets.controller.user.authentication.dto.UserRequest
+import br.com.tickets.orquestrator.tickets.controller.user.authentication.dto.UserValidatedRequest
+import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import br.com.tickets.orquestrator.tickets.services.UserService
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
@@ -45,16 +45,6 @@ class AuthController(private val userService: UserService) {
         @PathVariable(name = "email") email: String
     ): ResponseEntity<String> {
         return ResponseEntity.ok(userService.insertImage(email, file))
-    }
-
-    @GetMapping
-    @Operation(summary = "Recupera usuario com parametro")
-    fun getUserWithParam(
-        @RequestParam(name = "email", required = false) email: String?,
-        @RequestParam(name = "id", required = false) id: Long?,
-        @RequestParam(name = "name", required = false) name: String?
-    ): ResponseEntity<User> {
-        return ResponseEntity.ok(userService.getUser(id, name, email))
     }
 
     @PostMapping("/validated")

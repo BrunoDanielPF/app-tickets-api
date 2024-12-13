@@ -37,12 +37,10 @@ class SecurityConfig(
         return configuration.authenticationManager
     }
 
-//    @Bean
     fun customAuthenticationHandlerEntrypoint(): AuthenticationEntryPoint {
         return CustomAuthenticationHandlerEntryPoint()
     }
 
-//    @Bean
     fun customAccessDeniedHandler(): CustomAccessDeniedHandler {
         return CustomAccessDeniedHandler()
     }
@@ -60,9 +58,9 @@ class SecurityConfig(
                 auths
                     .requestMatchers("/users/**", "/h2-console/**").permitAll()
                     .requestMatchers("/swagger-ui.html", "/v2/api-docs", "/v3/api-docs", "/swagger-resources/**", "/swagger-ui/**", "/webjars/**").permitAll()
-                    .requestMatchers(HttpMethod.DELETE).hasRole("USER_ADMIN")
-                    .requestMatchers(HttpMethod.POST).hasRole("USER_ADMIN")
-                    .requestMatchers(HttpMethod.PUT).hasRole("USER_ADMIN")
+//                    .requestMatchers(HttpMethod.DELETE).hasRole("USER_ADMIN")
+                    .requestMatchers(HttpMethod.POST).authenticated()
+//                    .requestMatchers(HttpMethod.PUT).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.GET).permitAll()
                     .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
             }

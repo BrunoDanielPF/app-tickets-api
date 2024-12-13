@@ -1,20 +1,20 @@
 package br.com.tickets.orquestrator.tickets.services
 
-import br.com.tickets.orquestrator.tickets.controller.authentication.AuthenticationDTO
-import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserRequest
-import br.com.tickets.orquestrator.tickets.controller.authentication.dto.UserValidatedRequest
+import br.com.tickets.orquestrator.tickets.controller.user.authentication.AuthenticationDTO
+import br.com.tickets.orquestrator.tickets.controller.user.authentication.dto.UserRequest
+import br.com.tickets.orquestrator.tickets.controller.user.authentication.dto.UserValidatedRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.Image
-import br.com.tickets.orquestrator.tickets.domain.entity.Role
-import br.com.tickets.orquestrator.tickets.domain.entity.User
+import br.com.tickets.orquestrator.tickets.domain.entity.user.Role
+import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import br.com.tickets.orquestrator.tickets.exceptions.*
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
 import com.sendgrid.Method
 import com.sendgrid.Request
 import com.sendgrid.SendGrid
 import com.sendgrid.helpers.mail.Mail
-import com.sendgrid.helpers.mail.objects.Content
 import com.sendgrid.helpers.mail.objects.Email
 import com.sendgrid.helpers.mail.objects.Personalization
+import jakarta.persistence.EntityNotFoundException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -26,7 +26,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.server.ResponseStatusException
 import java.io.IOException
 import java.time.LocalDateTime
 import java.util.regex.Pattern
@@ -41,7 +40,7 @@ class UserService(
 
     val logger: Logger = LoggerFactory.getLogger(UserService::class.simpleName)
 
-    fun getUser(id: Long?, name: String?, email: String?): User {
+    fun getUser(id: Long? = null, name: String? = null, email: String?= null): User {
         email?.let {
             return userRepository.findByEmail(it).orElseThrow { UsernameNotFoundException("User Not found!") }
         }
@@ -65,7 +64,7 @@ class UserService(
 
     fun register(userRequest: UserRequest): ResponseEntity<Nothing> {
         if (userRequest.roles.isNullOrEmpty()) {
-            userRequest.roles = listOf(Role(1, "USER"))
+            userRequest.roles = mutableListOf(Role(1, "USER"))
         }
         if (userRepository.existsByEmail(userRequest.email)) {
             throw EmailInUseException("E-mail already exists")
@@ -110,6 +109,10 @@ class UserService(
 
         SecurityContextHolder.getContext().authentication = authentication
         return "User signed in successfully!"
+    }
+
+    fun saveUser(user: User): User {
+        return userRepository.save(user)
     }
 
     fun validatedEmailFromUser(userValidatedRequest: UserValidatedRequest) {
@@ -174,6 +177,20 @@ class UserService(
         } catch (ex: IOException) {
             logger.atError().setMessage(ex.message).log()
         }
+    }
+
+    fun userToOrganizer(userId: Long? = null, userName: String? = null, email: String? =null): String {
+        val user = getUser(id = userId, name = userName, email = email)
+        user.isOrganizer = true
+        user.roles.add(Role(3, "USER_ORGANIZER"))
+        userRepository.save(user)
+        return "User ${user.name}, is organizer now !"
+    }
+
+    fun isUserOrganizer(userId: Long): Boolean {
+        val user = userRepository.findById(userId)
+            .orElseThrow { EntityNotFoundException("User not found") }
+        return user.isOrganizer
     }
 
     private fun validatePassword(password: String): String {

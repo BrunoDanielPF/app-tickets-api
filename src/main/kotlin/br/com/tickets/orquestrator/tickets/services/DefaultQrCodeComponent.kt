@@ -1,4 +1,4 @@
-package br.com.tickets.orquestrator.tickets.service
+package br.com.tickets.orquestrator.tickets.services
 
 import br.com.tickets.orquestrator.tickets.domain.QRCodeData
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

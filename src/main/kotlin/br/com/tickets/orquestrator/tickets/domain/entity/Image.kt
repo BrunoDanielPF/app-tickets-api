@@ -60,8 +60,8 @@ data class Image(
 
             return Image(
                 name = name,
-                height = imageBuffered.height ?: 0,
-                width = imageBuffered.width ?: 0,
+                height = imageBuffered.height,
+                width = imageBuffered.width,
                 data = imageBase64,
                 extension = extension
             )

@@ -1,4 +1,4 @@
-package br.com.tickets.orquestrator.tickets.domain.entity
+package br.com.tickets.orquestrator.tickets.domain.entity.user
 
 import jakarta.persistence.*
 import java.io.Serializable
