@@ -5,6 +5,8 @@ import br.com.tickets.orquestrator.tickets.controller.events.dto.TicketEventRequ
 import br.com.tickets.orquestrator.tickets.controller.events.dto.TicketRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.events.Event
 import br.com.tickets.orquestrator.tickets.services.EventService
+import br.com.tickets.orquestrator.tickets.services.feign.dto.PaymentEventRequest
+import br.com.tickets.orquestrator.tickets.services.feign.dto.PixInformationResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.http.ResponseEntity
@@ -30,18 +32,17 @@ class EventController(
         return ResponseEntity.ok(eventService.createEvent(eventRequest, userOrganizerId))
     }
 
-//    @PostMapping("/{eventId}/{ticketId}")
-//    @Operation(
-//        summary = "Compra y ingresso para evento x",
-//        security = [SecurityRequirement(name = "basicScheme")]
-//    )
-//    fun buyTicketFromEvent(
-//        @PathVariable(name = "eventId") eventId: Long,
-//        @PathVariable(name = "ticketId") ticketId: Long,
-//        @RequestBody ticketRequest: TicketRequest
-//    ): ResponseEntity<Unit> {
-//        return ResponseEntity.ok(eventService.buyTicket(ticketId, ticketRequest.buyerEmail))
-//    }
+    @PostMapping("/purchase/{ticketId}")
+    @Operation(
+        summary = "Compra y ingresso para evento x",
+        security = [SecurityRequirement(name = "basicScheme")]
+    )
+    fun buyTicketFromEvent(
+        @PathVariable(name = "ticketId") ticketId: Long,
+        @RequestBody paymentEventRequest: PaymentEventRequest
+    ): ResponseEntity<PixInformationResponse> {
+        return ResponseEntity.ok(eventService.buyTicket(ticketId, paymentEventRequest))
+    }
 
     @PostMapping("/ticket/{eventId}")
     @Operation(
@@ -64,5 +65,13 @@ class EventController(
         @RequestParam(name = "id", required = true) id: Long,
     ): ResponseEntity<List<Event>> {
         return ResponseEntity.ok(eventService.getEventsFromOrganizer(id))
+    }
+
+    @GetMapping("/recents")
+    @Operation(
+        summary = "recupera os primeiros 15 eventos mais recentes da base de dados"
+    )
+    fun getTop15EventsCreatedAt(): ResponseEntity<List<Event>> {
+        return ResponseEntity.ok(eventService.getRecentEvents())
     }
 }

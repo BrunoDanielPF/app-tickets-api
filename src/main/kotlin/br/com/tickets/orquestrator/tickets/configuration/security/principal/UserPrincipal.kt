@@ -17,7 +17,7 @@ data class UserPrincipal(
             }
             return UserPrincipal(
                 email = user.email,
-                password = user.password,
+                password = user.password!!,
                 authorities = authorities
             )
         }

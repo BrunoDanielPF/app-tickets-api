@@ -56,7 +56,7 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auths ->
                 auths
-                    .requestMatchers("/users/**", "/h2-console/**").permitAll()
+                    .requestMatchers("/users/**", "events/purchase/**", "/h2-console/**").permitAll()
                     .requestMatchers("/swagger-ui.html", "/v2/api-docs", "/v3/api-docs", "/swagger-resources/**", "/swagger-ui/**", "/webjars/**").permitAll()
 //                    .requestMatchers(HttpMethod.DELETE).hasRole("USER_ADMIN")
                     .requestMatchers(HttpMethod.POST).authenticated()

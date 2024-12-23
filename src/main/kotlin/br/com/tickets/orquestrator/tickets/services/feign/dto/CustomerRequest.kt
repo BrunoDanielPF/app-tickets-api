@@ -1,6 +1,7 @@
 package br.com.tickets.orquestrator.tickets.services.feign.dto
 
 import com.google.gson.annotations.SerializedName
+import jakarta.validation.constraints.NotNull
 
 data class CustomerRequest(
 
@@ -14,5 +15,6 @@ data class CustomerRequest(
 	val cpfCnpj: String? = null,
 
 	@field:SerializedName("email")
-	val email: String? = null
+	@field:NotNull(message = "Email nao pode ser nulo")
+	val email: String
 )

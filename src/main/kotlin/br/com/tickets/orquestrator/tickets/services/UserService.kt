@@ -8,6 +8,7 @@ import br.com.tickets.orquestrator.tickets.domain.entity.user.Role
 import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import br.com.tickets.orquestrator.tickets.exceptions.*
 import br.com.tickets.orquestrator.tickets.repository.UserRepository
+import br.com.tickets.orquestrator.tickets.services.utils.generateEmailCode
 import com.sendgrid.Method
 import com.sendgrid.Request
 import com.sendgrid.SendGrid
@@ -198,10 +199,6 @@ class UserService(
             throw PasswordFormatException()
         }
         return password
-    }
-
-    private fun generateEmailCode(): Int {
-        return (1000..9999).random()
     }
 
     private fun generateTimeExpirationCode(): LocalDateTime? {

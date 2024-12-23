@@ -44,7 +44,7 @@ class CustomBasicAuthenticationFilter(
             }
 
             val user = userOptional.get()
-            val valid = checkPassword(user.password, password)
+            val valid = checkPassword(user.password!!, password)
 
             if (!valid) {
                 response.status = HttpServletResponse.SC_UNAUTHORIZED

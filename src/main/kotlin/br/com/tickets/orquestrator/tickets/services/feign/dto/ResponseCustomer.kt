@@ -1,5 +1,7 @@
 package br.com.tickets.orquestrator.tickets.services.feign.dto
 
+import br.com.tickets.orquestrator.tickets.domain.entity.user.Role
+import br.com.tickets.orquestrator.tickets.domain.entity.user.User
 import com.google.gson.annotations.SerializedName
 
 data class ResponseCustomer(
@@ -71,8 +73,21 @@ data class ResponseCustomer(
 	val personType: String? = null,
 
 	@field:SerializedName("email")
-	val email: String? = null,
+	val email: String,
 
 	@field:SerializedName("object")
 	val objectCustomer: String? = null
-)
+) {
+	fun createUser(): User {
+		return User(
+            email = email,
+            name = name!!,
+            password = TODO(),
+            emailValidated = TODO(),
+            emailCode = TODO(),
+            emailCodeExpiration = TODO(),
+            isOrganizer = false,
+            roles = mutableListOf(Role(1, "USER"))
+        )
+	}
+}

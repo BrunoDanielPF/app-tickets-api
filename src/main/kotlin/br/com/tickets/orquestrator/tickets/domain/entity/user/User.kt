@@ -28,7 +28,7 @@ data class User(
     var name: String,
 
     @JsonProperty("senha")
-    var password: String,
+    var password: String?,
 
     var emailValidated: Boolean,
 
