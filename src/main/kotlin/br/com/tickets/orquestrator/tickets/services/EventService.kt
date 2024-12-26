@@ -53,7 +53,7 @@ class EventService(
                 Event(
                     name = eventRequest.name,
                     location = eventRequest.location,
-                    date = LocalDateTime.now(),
+                    date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                     description = eventRequest.description,
                     organizer = user,
                     totalTickets = eventRequest.totalTickets!!

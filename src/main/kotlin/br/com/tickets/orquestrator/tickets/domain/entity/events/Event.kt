@@ -29,7 +29,7 @@ data class Event(
     val location: String,
 
     @Column(nullable = false)
-    val date: LocalDateTime,
+    val date: String,
 
     @Column(nullable = false, length = 500)
     val description: String,
