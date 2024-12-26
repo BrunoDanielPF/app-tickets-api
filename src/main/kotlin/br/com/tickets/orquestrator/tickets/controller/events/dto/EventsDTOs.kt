@@ -2,6 +2,7 @@ package br.com.tickets.orquestrator.tickets.controller.events.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -15,7 +16,11 @@ data class EventRequest(
     val location: String,
 
     @JsonProperty("data")
-    val date: LocalDateTime,
+    @field:Pattern(
+        regexp = "^\\d{2}-\\d{2}-\\d{4}$",
+        message = "A data deve estar no formato dd-MM-yyyy (exemplo: 25-12-2025)"
+    )
+    val date: String,
 
     @JsonProperty("descrição")
     @NotNull
