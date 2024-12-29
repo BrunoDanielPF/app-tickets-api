@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Service
 class EventService(
@@ -42,7 +43,7 @@ class EventService(
         return eventList
     }
 
-    fun getRecentEvents() : List<Event> {
+    fun getRecentEvents(): List<Event> {
         return eventRepository.findTop15EventsByCreatedOn()
     }
 
@@ -181,5 +182,12 @@ class EventService(
         return eventRepository.findById(eventId).orElseThrow {
             throw RuntimeException("Event not found")
         }
+    }
+
+    fun getBydID(id: Long): Event {
+        return Optional.ofNullable(eventRepository.getReferenceById(id))
+            .orElseThrow {
+                ResponseStatusException(HttpStatus.NOT_FOUND, "Event with $id not found")
+            }
     }
 }

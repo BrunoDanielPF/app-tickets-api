@@ -2,7 +2,6 @@ package br.com.tickets.orquestrator.tickets.controller.events
 
 import br.com.tickets.orquestrator.tickets.controller.events.dto.EventRequest
 import br.com.tickets.orquestrator.tickets.controller.events.dto.TicketEventRequest
-import br.com.tickets.orquestrator.tickets.controller.events.dto.TicketRequest
 import br.com.tickets.orquestrator.tickets.domain.entity.events.Event
 import br.com.tickets.orquestrator.tickets.services.EventService
 import br.com.tickets.orquestrator.tickets.services.feign.dto.PaymentEventRequest
@@ -44,6 +43,13 @@ class EventController(
         return ResponseEntity.ok(eventService.buyTicket(ticketId, paymentEventRequest))
     }
 
+    @GetMapping("/{id}")
+    @Operation(
+        summary = "Recupera evento pelo ID do evento"
+    )
+    fun getEventByID(@PathVariable(value = "id") id : Long): ResponseEntity<Event> {
+        return ResponseEntity.ok(eventService.getBydID(id))
+    }
     @PostMapping("/ticket/{eventId}")
     @Operation(
         summary = "Cria ingressos para evento",
